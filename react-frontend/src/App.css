@@ -108,21 +108,21 @@
 }
 
 .button-container {
-  margin-top: 20px; /* Add some space above the button */
+  margin-top: 2rem; /* Add some space above the button */
   margin: auto;
   width: 100%;
 }
 
 .demo-button {
-  padding: 10px 20px;
   font-size: 18px;
   color: white;
   background-color: #d46b16; /* Button color */
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  
-  
+  padding: 0.75rem 2rem;
+  text-decoration: none;
+  margin-top: 3rem;
 }
 
 .demo-button:hover {

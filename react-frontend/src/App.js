@@ -3,6 +3,7 @@ import './App.css';
 import DownArrow from './darr.svg'; // Update the path as necessary
 import Lottie from 'lottie-react';
 import animationData from './fish.json'; // Adjust the path to your animation JSON file
+import { Link } from 'react-router-dom';
 
 function App() {
   const [scrollY, setScrollY] = useState(0);
@@ -125,9 +126,11 @@ function App() {
       Our innovative product is a machine learning-based coral reef monitoring system designed to safeguard these fragile ecosystems. At the heart of our solution is a waterproof robot equipped with a high-resolution camera and a temperature sensor, enabling real-time monitoring of coral health and environmental conditions. By leveraging advanced machine learning algorithms, the system analyzes data to detect potential threats and problems with coral reefs, empowering conservationists and researchers with actionable insights. With our monitoring system, we aim to contribute to the preservation of coral reefs and foster a sustainable future for marine life.
     </p>
     <div className={`button-container ${scrollY > 1200 ? 'fade-in' : ''}`}>
-    <button onClick={goToDemo} className={`demo-button`}>
+    <Link to="login" className="demo-button">
     Log In
-    </button>
+    </Link>
+  
+    
   </div>
   </div>  
   
