@@ -10,7 +10,7 @@
   flex-direction: column; /* Stack children vertically */
   justify-content: center;
   align-items: center;
-  background: url('bg.png') no-repeat center center fixed;
+  background: url('bg1.png') no-repeat center center fixed;
   color: white;
 }
 
@@ -27,7 +27,7 @@
   display: flex; /* Use flex to create a two-column layout */
   justify-content: space-around; /* Space columns evenly */
   align-items: center;
-  background: url('bg.png') no-repeat center center fixed;
+  background: url('bg1.png') no-repeat center center fixed;
   color: white;
   padding: 20px;
   box-sizing: border-box;
