@@ -5,6 +5,7 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import Highcharts, { Options } from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
+import './map.css';
 
 // Define the default icon for Leaflet
 let DefaultIcon = L.icon({
@@ -32,6 +33,11 @@ const Map = () => {
     // Initialize the Leaflet map without zoom controls
     const map = L.map("map", {
       zoomControl: false, // Disable zoom controls
+      maxBounds: [
+        [-90, -180], // Southwest coordinates
+        [90, 180]    // Northeast coordinates
+      ],
+      maxBoundsViscosity: 1.0 // Sets how firmly the map sticks to the defined bounds (1.0 = strict)
     }).setView([51.505, -0.09], 6);
 
     // Add a tile layer using Mapbox styles
@@ -67,13 +73,24 @@ const Map = () => {
         ];
 
         const processedCoral = {
+          chart: {
+            backgroundColor: 'transparent', // Make the background transparent
+          },
           title: {
             text: 'Coral Bleached Over Time',
+            style: {
+              color: '#FFFFFF', // Make title text white
+              fontWeight: 'bold'
+            }
           },
           xAxis: {
             type: 'datetime',
             title: {
               text: 'Date',
+              style: {
+                color: '#FFFFFF', // Make X-axis title white
+                fontWeight: 'bold'
+              }
             },
             tickInterval: 24 * 3600 * 1000, // One day
             dateTimeLabelFormats: {
@@ -82,28 +99,58 @@ const Map = () => {
             labels: {
               rotation: -45, // Rotate labels for better visibility
               align: 'right', // Align labels to the right
+              style: {
+                color: '#FFFFFF', // Make X-axis labels white
+                fontWeight: 'bold'
+              }
             },
+            lineColor: '#FFFFFF', // Make X-axis line white
+            tickColor: '#FFFFFF'  // Make X-axis ticks white
           },
           yAxis: {
             title: {
               text: '% Bleached',
+              style: {
+                fontWeight: 'bold',
+                color: '#FFFFFF' // Make Y-axis title white
+              }
             },
+            labels: {
+              style: {
+                fontWeight: 'bold',
+                color: '#FFFFFF' // Make Y-axis labels white
+              }
+            },
+            gridLineColor: 'rgba(255, 255, 255, 0.2)', // Optionally, make gridlines subtle white
+            lineColor: '#FFFFFF', // Make Y-axis line white
+            tickColor: '#FFFFFF'  // Make Y-axis ticks white
           },
           series: [{
             name: '% Bleached',
+            fontWeight: 'bold',
             data: coralData.map(item => [new Date(item.date).getTime(), item.value]),
             type: 'line',
+            color: '#d46b16', // Make the line white
             tooltip: {
               valueSuffix: '%',
+            },
+            lineWidth: 3, // Increase the line thickness
+            marker: {
+              lineColor: '#d46b16' // Make marker outline white
             }
           }],
           tooltip: {
             shared: true,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)', // Optional: Adjust tooltip background color
+            style: {
+              color: '#FFFFFF' // Optional: Adjust tooltip text color
+            }
           },
           plotOptions: {
             series: {
               marker: {
                 enabled: true,
+                fillColor: '#FFFFFF' // Make marker fill white
               }
             }
           }
@@ -122,13 +169,24 @@ const Map = () => {
           { date: "2023-09-07", value: 30 },
         ];
         const processedTemp = {
+          chart: {
+            backgroundColor: 'transparent', // Make the background transparent
+          },
           title: {
             text: 'Average Coral Temperature Over Time',
+            style: {
+              fontWeight: 'bold',
+              color: '#FFFFFF' // Make title text white
+            }
           },
           xAxis: {
             type: 'datetime',
             title: {
               text: 'Date',
+              style: {
+                fontWeight: 'bold',
+                color: '#FFFFFF' // Make X-axis title white
+              }
             },
             tickInterval: 24 * 3600 * 1000, // One day
             dateTimeLabelFormats: {
@@ -137,28 +195,56 @@ const Map = () => {
             labels: {
               rotation: -45, // Rotate labels for better visibility
               align: 'right', // Align labels to the right
+              style: {
+                fontWeight: 'bold',
+                color: '#FFFFFF' // Make X-axis labels white
+              }
             },
+            lineColor: '#FFFFFF', // Make X-axis line white
+            tickColor: '#FFFFFF'  // Make X-axis ticks white
           },
           yAxis: {
             title: {
               text: 'Temperature (°C)',
+              style: {
+                fontWeight: 'bold',
+                color: '#FFFFFF' // Make Y-axis title white
+              }
             },
+            labels: {
+              style: {
+                color: '#FFFFFF' // Make Y-axis labels white
+              }
+            },
+            gridLineColor: 'rgba(255, 255, 255, 0.2)', // Optionally, make gridlines subtle white
+            lineColor: '#FFFFFF', // Make Y-axis line white
+            tickColor: '#FFFFFF'  // Make Y-axis ticks white
           },
           series: [{
             name: 'Temperature',
             data: tempData.map(item => [new Date(item.date).getTime(), item.value]),
             type: 'line',
+            color: '#d46b16', // Make the line white
             tooltip: {
               valueSuffix: ' °C',
+            },
+            lineWidth: 3,
+            marker: {
+              lineColor: '#FFFFFF' // Make marker outline white
             }
           }],
           tooltip: {
             shared: true,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)', // Optional: Adjust tooltip background color
+            style: {
+              color: '#333' // Optional: Adjust tooltip text color
+            }
           },
           plotOptions: {
             series: {
               marker: {
                 enabled: true,
+                fillColor: '#FFFFFF' // Make marker fill white
               }
             }
           }
@@ -180,8 +266,8 @@ const Map = () => {
           const marker = L.marker([lat, lng], {
             icon: L.icon({
               iconUrl: classification
-                ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"
-                : "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+                ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png"
+                : "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
             }),
           }).addTo(map);
 
@@ -238,19 +324,21 @@ const Map = () => {
       {/* Dashboard Container */}
       {isDashboardVisible && (
         <div
-          style={{
-            width: "35%",
-            height: "100vh",
-            backgroundColor: "#f4f4f4",
-            padding: "10px",
-            boxSizing: "border-box",
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center", // Horizontally center the content
-          }}
+        style={{
+          width: "35%",
+          height: "100vh",
+          backgroundImage: "url('bg.png')", // Add the image URL here
+          backgroundSize: "cover", // Ensure the image covers the entire area
+          backgroundPosition: "center", // Center the image
+          padding: "10px",
+          boxSizing: "border-box",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center", // Horizontally center the content
+        }}
         >
-          <h2 style={{ textAlign: "center", width: "100%", marginBottom: "30px" }}>Quoral Dashboard</h2>
+          <h1 style={{ color: "#FFFFFF", textAlign: "center", width: "100%", marginTop: "30px", marginBottom: "30px" }}>QUORAL Dashboard</h1>
           <div style={{ width: "100%", height: "100%", }}>
             <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "90%" } }}/>
           </div>
@@ -259,7 +347,7 @@ const Map = () => {
           </div>
 
           {/* Recent Markers Section */}
-          <div style={{ width: "100%", overflowY: "auto", maxHeight: "200px" }}>
+          {/* <div style={{ width: "100%", overflowY: "auto", maxHeight: "200px" }}>
             <h3>Recent Markers</h3>
             <ul style={{ listStyleType: "none", padding: 0 }}>
               {recentMarkers.map(marker => (
@@ -268,7 +356,7 @@ const Map = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
       )}
 
@@ -280,53 +368,6 @@ const Map = () => {
           width: isDashboardVisible ? "70%" : "100%", // Adjust width based on dashboard visibility
         }}
       ></div>
-
-      {/* Hamburger Toggle Button */}
-      <div
-        onClick={toggleDashboard}
-        style={{
-          position: "fixed", // Keep hamburger fixed to the viewport
-          top: "20px",
-          left: "20px", // Always stay on the left side
-          zIndex: 1000,
-          cursor: "pointer",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          width: "30px",
-          height: "22px",
-          padding: "5px",
-          backgroundColor: "#fff",
-          borderRadius: "5px",
-          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-        }}
-      >
-        {/* Hamburger Lines */}
-        <span
-          style={{
-            height: "3px",
-            width: "100%",
-            backgroundColor: "#333",
-            borderRadius: "2px",
-          }}
-        ></span>
-        <span
-          style={{
-            height: "3px",
-            width: "100%",
-            backgroundColor: "#333",
-            borderRadius: "2px",
-          }}
-        ></span>
-        <span
-          style={{
-            height: "3px",
-            width: "100%",
-            backgroundColor: "#333",
-            borderRadius: "2px",
-          }}
-        ></span>
-      </div>
     </div>
   );
 };
