@@ -43,5 +43,21 @@ def test_upload_endpoint():
         # Close the file
         files['image'][1].close()
 
+def test_devices_endpoint():
+    try:
+        # Send the GET request
+        response = requests.get(f"{BASE_URL}/devices")
+
+        # Check the response
+        if response.status_code == 200:
+            print("Test successful!")
+            print("Response:", response.json())
+        else:
+            print(f"Test failed with status code: {response.status_code}")
+            print("Response:", response.text)
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
 if __name__ == "__main__":
     test_upload_endpoint()
+    test_devices_endpoint()

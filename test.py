@@ -138,7 +138,8 @@ def upload():
         clt_3.fit(box.reshape(-1, 3))
         clt_3_centroids = clt_3.cluster_centers_
         # Sort centroids by their distance to white (255, 255, 255)
-        sorted_centroids = sorted(clt_3_centroids, key=lambda c: np.linalg.norm(c - np.array([255, 255, 255])))
+        avg_color = np.mean(clt_3_centroids, axis=0)
+        sorted_centroids = sorted(clt_3_centroids, key=lambda x: np.linalg.norm(x - avg_color))
         bleaching = np.asarray(sorted_centroids[:3]).sum()
         b_avg += bleaching
         total += 1
@@ -163,6 +164,7 @@ def upload():
     # Commit the transaction and close the connection
     conn.commit()
     conn.close()
+    return jsonify({"message": "File and measurements received successfully"}), 200
         
     # Process the image and measurements here
     # For now, we'll just return a success message
@@ -172,7 +174,7 @@ def get_at_location():
     latitude = request.args.get('latitude', type=float)
     longitude = request.args.get('longitude', type=float)
 
-    # Retrieve data based on latitude and longitude
+    # Retrieve data based on latitude and lgitongitude
     # For now, we'll just return a dummy response
     return jsonify({"message": f"Data for location ({latitude}, {longitude})"}), 200
 
@@ -181,6 +183,61 @@ def alerts():
     # Retrieve alerts
     # For now, we'll just return a dummy response
     return jsonify({"alerts": "No alerts at the moment"}), 200
+
+@app.route('/devices', methods=['GET'])
+def get_devices():
+    # Get the number of random records to return (k) from query parameters
+    k = request.args.get('k', default=5, type=int)  # Default to 5 if k is not provided
+
+    # Establish connection to the database
+    conn = sqlite3.connect('measurements.db')
+    try:
+        # SQL query to select random k rows with the specified fields
+        query = """
+        SELECT id, latitude, longitude, temperature, bleaching
+        FROM measurements
+        ORDER BY RANDOM()
+        LIMIT ?
+        """
+        cursor = conn.execute(query, (k,))
+        rows = cursor.fetchall()
+
+        # Convert rows to a list of dictionaries
+        table = {}
+        for row in sorted(rows, key=lambda x: x[0]):
+            if row[0] not in table:
+                table[row[0]] = {
+                    "latitude": row[1],
+                    "longitude": row[2],
+                    "temperature": row[3],
+                    "bleaching": row[4],
+                    "num_measurements": 1
+                }
+            else:
+                n = table[row[0]]["num_measurements"]
+                table[row[0]]["temperature"] = (table[row[0]]["temperature"]*n + row[3]) / (n+1)
+                table[row[0]]["bleaching"] = (table[row[0]]["bleaching"]*n + row[4]) / (n+1)
+                table[row[0]]["num_measurements"] += 1
+        net_h = 0
+        total = 0
+        for key in table:
+            h = table[key]["temperature"] * 40 + table[key]["bleaching"]
+            table[key]["h"] = h
+            net_h += h
+            total += 1
+        list_of_h = []
+        for key in table:
+            if h > net_h/total:
+                list_of_h.append({"id": key, "latitude": table[key]["latitude"], "longitude": table[key]["longitude"], "bleached": 1})
+            else:
+                list_of_h.append({"id": key, "latitude": table[key]["latitude"], "longitude": table[key]["longitude"], "bleached": 0})
+        print(list_of_h)
+        return list_of_h
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
