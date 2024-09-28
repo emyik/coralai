@@ -5,7 +5,7 @@ const Login = () => {
     return (
         <div className="login-container">
             <form className="login-form">
-                <h2>Login</h2>
+                <h2>LOGIN</h2>
                 <div className="form-group">
                     <label htmlFor="username">Username:</label>
                     <input type="text" id="username" name="username" required />
