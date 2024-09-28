@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -22,6 +22,8 @@ const Map = () => {
   const [bleachedCoralData, setBleachedCoralData] = useState([]);
   const [averageTempData, setAverageTempData] = useState([]);
   const [recentMarkers, setRecentMarkers] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     // Clean up existing map instances
@@ -29,7 +31,12 @@ const Map = () => {
     if (container != null) {
       container._leaflet_id = null;
     }
-
+    const alertsData = [
+      { id: 1, status: "Good", description: "Marker 1 is healthy Marker 1 is healthy Marker 1 is healthy Marker 1 is healthyMarker 1 is healthyMarker 1 is healthy", markerId: 1 },
+      { id: 2, status: "Bad", description: "Marker 2 is bleached", markerId: 2 },
+      { id: 3, status: "Good", description: "Marker 3 is healthy", markerId: 3 },
+    ];
+    setAlerts(alertsData);
     // Initialize the Leaflet map without zoom controls
     const map = L.map("map", {
       zoomControl: false, // Disable zoom controls
@@ -39,6 +46,9 @@ const Map = () => {
       ],
       maxBoundsViscosity: 1.0 // Sets how firmly the map sticks to the defined bounds (1.0 = strict)
     }).setView([51.505, -0.09], 6);
+
+    mapRef.current = map;
+
 
     // Add a tile layer using Mapbox styles
     L.tileLayer(
@@ -309,65 +319,88 @@ const Map = () => {
     };
   }, []);
 
+  const focusMarker = (markerId) => {
+    const marker = recentMarkers.find(m => m.id === markerId);
+    if (marker) {
+      mapRef.current.setView([marker.lat, marker.lng], 13); // Adjust zoom level as needed
+    }
+  };
   // Toggle the visibility of the dashboard
   const toggleDashboard = () => {
     setIsDashboardVisible((prev) => !prev);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: isDashboardVisible ? "row" : "row-reverse",
-      }}
-    >
-      {/* Dashboard Container */}
+    <div style={{ display: "flex", flexDirection: isDashboardVisible ? "row" : "row-reverse" }}>
       {isDashboardVisible && (
-        <div
-        style={{
+        <div style={{
           width: "35%",
           height: "100vh",
-          backgroundImage: "url('bg.png')", // Add the image URL here
-          backgroundSize: "cover", // Ensure the image covers the entire area
-          backgroundPosition: "center", // Center the image
+          backgroundImage: "url('bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           padding: "10px",
           boxSizing: "border-box",
           position: "relative",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center", // Horizontally center the content
-        }}
-        >
-          <h1 style={{ color: "#FFFFFF", textAlign: "center", width: "100%", marginTop: "30px", marginBottom: "30px" }}>QUORAL Dashboard</h1>
-          <div style={{ width: "100%", height: "100%", }}>
-            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "90%" } }}/>
-          </div>
-          <div style={{ width: "100%", height: "100%"}}>
-            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "90%" } }}/>
+          alignItems: "center",
+        }}>
+          <h1 style={{ color: "#FFFFFF", textAlign: "center", width: "100%", marginTop: "30px", marginBottom: "8px" }}>QUORAL Dashboard</h1>
+          <h2 style={{ color: "#FFFFFF", textAlign: "center", fontSize: "20px", margin: "8px 0" }}>Alerts</h2>
+
+          {/* Alerts Section */}
+          <div style={{ width: "100%", marginBottom: "20px" }}>
+            {alerts.map(alert => (
+              <div
+                key={alert.id}
+                onClick={() => focusMarker(alert.markerId)}
+                style={{
+                  border: "1px solid white", // Black border
+                  color: "white", // Text color
+                  padding: "5px",
+                  marginBottom: "3px",
+                  cursor: "pointer",
+                  display: "flex", // Flex to align items
+                  alignItems: "center", // Center vertically
+                  fontSize: "0.8em", // Smaller text size
+                  transition: "background-color 0.3s, color 0.3s", // Transition for hover effects
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)"; // Light hover effect
+                  e.currentTarget.style.color = "black"; // Change text color on hover
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent"; // Remove hover effect
+                  e.currentTarget.style.color = "white"; // Revert text color
+                }}
+              >
+                {/* Dot indicator based on alert status */}
+                <div
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    backgroundColor: alert.status === "Good" ? "#005700" : "red", // Dot color
+                    marginRight: "8px", // Space between dot and text
+                  }}
+                />
+                <span style={{ flex: 1, textAlign: "left" }}>{alert.description}</span> {/* Align text to the left */}
+              </div>
+            ))}
           </div>
 
-          {/* Recent Markers Section */}
-          {/* <div style={{ width: "100%", overflowY: "auto", maxHeight: "200px" }}>
-            <h3>Recent Markers</h3>
-            <ul style={{ listStyleType: "none", padding: 0 }}>
-              {recentMarkers.map(marker => (
-                <li key={marker.id} style={{ margin: "5px 0" }}>
-                  <b>{marker.name}</b> - Lat: {marker.lat}, Lng: {marker.lng}, Classification: {marker.classification}
-                </li>
-              ))}
-            </ul>
-          </div> */}
+
+          <div style={{ width: "100%", height: "100%" }}>
+            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "97%" } }} />
+          </div>
+          <div style={{ width: "100%", height: "100%" }}>
+            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "100%" } }} />
+          </div>
         </div>
       )}
 
-      {/* Map Container */}
-      <div
-        id="map"
-        style={{
-          height: "100vh",
-          width: isDashboardVisible ? "70%" : "100%", // Adjust width based on dashboard visibility
-        }}
-      ></div>
+      <div id="map" style={{ height: "100vh", width: isDashboardVisible ? "70%" : "100%" }}></div>
     </div>
   );
 };

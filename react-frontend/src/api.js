@@ -92,5 +92,22 @@ export const fetchRecentMarkers = async () => {
     }
 };
 
+// Function to fetch recent markers data
+export const fetchAlerts = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}/alerts/`);
+        if (!response.ok) {
+            throw new Error(`Error fetching alerts: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+
 
 

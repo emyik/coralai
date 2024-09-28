@@ -215,7 +215,7 @@ const MarkerInfo = () => {
                     Marker {id} Information
                 </h2>
                 <h3 style={{ margin: '10px 0', fontSize: '20px', fontWeight: 'normal', color: "#FFFFFF"}}>
-                    Status:
+                    Most Recent Status:
                     <span style={{ color: bleachedPrediction['bleached'] ? 'red' : 'green', fontWeight: 'bold' }}>
                         {bleachedPrediction['bleached'] ? ' Bleached' : ' Healthy'}
                     </span>
