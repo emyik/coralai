@@ -134,7 +134,7 @@ const Map = () => {
             tooltip: {
               valueSuffix: '%',
             },
-            lineWidth: 3, // Increase the line thickness
+            lineWidth: 5, // Increase the line thickness
             marker: {
               lineColor: '#d46b16' // Make marker outline white
             }
@@ -228,7 +228,7 @@ const Map = () => {
             tooltip: {
               valueSuffix: ' °C',
             },
-            lineWidth: 3,
+            lineWidth: 5,
             marker: {
               lineColor: '#FFFFFF' // Make marker outline white
             }
@@ -276,7 +276,7 @@ const Map = () => {
           const popupContent = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: bold;">${name}</span>
-              <a href="${markerInfoLink}" target="_blank" style="text-decoration: none; color: inherit;">
+              <a href="${markerInfoLink}" target="_blank" style="text-decoration: none; color: black;">
                 ${ExternalLinkIcon()}
               </a>
             </div>
