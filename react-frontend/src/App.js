@@ -4,6 +4,7 @@ import Landing from "./Landing"
 import MarkerInfo from './MarkerInfo';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from './Login';
+import Navbar from './Navbar';
 function App() {
   const [data, setData] = useState(null);
 
@@ -16,8 +17,10 @@ function App() {
   return (
     <div className="App">
       <Router>
+        <Navbar />
+        
         <Routes>
-        <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Landing />} />
 
           <Route path="/map" element={<Map />} />
 

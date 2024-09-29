@@ -4,6 +4,7 @@ import DownArrow from './darr.svg'; // Update the path as necessary
 import Lottie from 'lottie-react';
 import animationData from './fish.json'; // Adjust the path to your animation JSON file
 import { Link } from 'react-router-dom';
+import coralCartoon from './coral-cartoon.png'; // Import the image
 
 function Landing() {
   const [scrollY, setScrollY] = useState(0);
@@ -98,11 +99,11 @@ function Landing() {
         {renderFish()}
         <h1 className={`scroll-text ${scrollY === 0 ? 'fade-in' : ''}`}>QUORAL</h1>
         <p className={`scroll-text ${scrollY === 0 ? 'fade-in' : ''}`}>An ML-Based Coral Monitoring System</p>
-        <Link to="login" className="demo-button" style={{marginTop: "10px"}}>
+        <Link to="login" className="demo-button" style={{ marginTop: "10px" }}>
           Log In
         </Link>
         <div className="scroll-arrow" onClick={scrollDown}>
-          
+
           <img src={DownArrow} alt="Scroll down" width="40" height="40" />
         </div>
 
@@ -112,11 +113,17 @@ function Landing() {
       <section className="content-section">
         <div className="column left">
           <h2 className={`scroll-text ${scrollY > 300 ? 'fade-in' : ''}`}>The Importance of Coral Reefs</h2>
+          <img className={`scroll-text ${scrollY > 300 ? 'fade-in' : ''}`}
+            src={coralCartoon} // Make sure to provide the correct path to the image
+            alt="Coral reef illustration"
+            style={{ width: '40%', height: 'auto', marginTop: '20px' }} // Adjust styling as needed
+          />
         </div>
         <div className="column right">
           <p className={`scroll-text ${scrollY > 300 ? 'fade-in' : ''}`}>
             Coral reefs are vital ecosystems that support a staggering variety of marine life, serving as crucial habitats for countless species. They protect coastlines from erosion, provide resources for local communities, and contribute significantly to global biodiversity. However, coral reefs are facing unprecedented threats from climate change, pollution, and overfishing, leading to alarming rates of degradation. Preserving these underwater wonders is essential not only for marine health but also for the well-being of human populations reliant on them for food and economic stability.
           </p>
+         
           <div className="scroll-arrow" onClick={scrollDown}>
             <img src={DownArrow} alt="Scroll to next section" width="40" height="40" />
           </div>

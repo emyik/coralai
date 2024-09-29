@@ -1,0 +1,35 @@
+/* Navbar.css */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #d07428; /* Change the background color as needed */
+    padding: 15px;
+    color: white;
+    top: 0; /* Position it at the top */
+    left: 0; /* Align it to the left */
+    position: fixed;
+}
+
+.navbar-title {
+    font-size: 28px; /* Increased font size */
+    margin-left: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Small shadow effect */
+}
+
+.navbar-links {
+    display: flex;
+    gap: 15px; /* Spacing between links */
+    margin-right: 10px;
+}
+
+.navbar-link {
+    color: white;
+    text-decoration: none; /* Remove underline */
+    font-size: 20px; /* Increased font size for links */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Small shadow effect for links */
+}
+
+.navbar-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}

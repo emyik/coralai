@@ -3,6 +3,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useParams, Link } from 'react-router-dom';
 import './map.css';
+import { fetchAverageTemperature, fetchBleachedCoralDataId, fetchBleachedCoralStatus, fetchPastImages } from './api';
 
 const MarkerInfo = () => {
     const [averageTempData, setAverageTempData] = useState({});
@@ -11,192 +12,215 @@ const MarkerInfo = () => {
     const [zoomedImage, setZoomedImage] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for slideshow
     let { id } = useParams();
+    const [images, setImages] = useState([]);
 
-    const imageUrls = [
-        'https://www.w3schools.com/css/paris.jpg',
-        'https://i.pinimg.com/736x/eb/c9/af/ebc9afde8c2b05bbf639cfc1c56dc59a.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/4/4e/Sementales_H-B_monchina_400x300.jpg',
-    ];
 
+    const img = require.context('../public/images', true);
 
     useEffect(() => {
-        // Dummy temperature data for the specific marker
-        const tempData = [
-            { date: '2023-09-01', value: 25 },
-            { date: '2023-09-02', value: 26 },
-            { date: '2023-09-03', value: 27 },
-            { date: '2023-09-04', value: 28 },
-            { date: '2023-09-05', value: 27 },
-            { date: '2023-09-06', value: 29 },
-            { date: '2023-09-07', value: 30 },
-        ];
+        const fetchData = async () => {
+            try {
+                try {
+                const fetchedImages = await fetchPastImages(id);
+                console.log(fetchedImages);
+                setImages(fetchedImages.map(x => img(`./${x.split('/')[1]}`)))
 
-        // Process temperature data into Highcharts format
-        const processedTemp = {
-            chart: {
-                backgroundColor: 'transparent',
-            },
-            title: {
-                text: 'Average Temperature Over Time',
-                style: {
-                    color: '#FFFFFF',
-                    fontWeight: 'bold'
                 }
-            },
-            xAxis: {
-                type: 'datetime',
-                title: {
-                    text: 'Date',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                tickInterval: 24 * 3600 * 1000,
-                dateTimeLabelFormats: { day: '%m-%d' },
-                labels: {
-                    rotation: -45,
-                    align: 'right',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                lineColor: '#FFFFFF',
-                tickColor: '#FFFFFF'
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature (°C)',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                labels: {
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                gridLineColor: 'rgba(255, 255, 255, 0.2)',
-                lineColor: '#FFFFFF',
-                tickColor: '#FFFFFF'
-            },
-            series: [{
-                name: 'Temperature',
-                data: tempData.map(item => [new Date(item.date).getTime(), item.value]),
-                type: 'line',
-                color: '#d46b16',
-                tooltip: {
-                    valueSuffix: ' °C',
-                },
-                lineWidth: 5,
-                marker: {
-                    lineColor: '#FFFFFF'
-                }
-            }],
-            tooltip: {
-                shared: true,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                style: {
-                    color: '#333'
-                }
-            },
-            plotOptions: {
-                series: {
-                    marker: {
-                        enabled: true,
-                        fillColor: '#FFFFFF'
-                    }
-                }
-            }
-        };
+                catch(e) {
 
-        setAverageTempData(processedTemp);
-
-        // Dummy coral bleached status data
-        const coralBleachedData = [
-            { date: '2023-09-01', value: 0, status: 'Healthy' },
-            { date: '2023-09-02', value: 1, status: 'Bleached' },
-            { date: '2023-09-03', value: 1, status: 'Bleached' },
-            { date: '2023-09-04', value: 0, status: 'Healthy' },
-            { date: '2023-09-05', value: 1, status: 'Bleached' },
-            { date: '2023-09-06', value: 1, status: 'Bleached' },
-            { date: '2023-09-07', value: 0, status: 'Healthy' },
-        ];
-
-        // Process coral bleached data into Highcharts format
-        const processedCoralBleached = {
-            chart: {
-                backgroundColor: 'transparent',
-            },
-            title: {
-                text: 'Coral Bleached Over Time',
-                style: {
-                    color: '#FFFFFF',
-                    fontWeight: 'bold'
                 }
-            },
-            xAxis: {
-                type: 'datetime',
-                title: {
-                    text: 'Date',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                tickInterval: 24 * 3600 * 1000,
-                dateTimeLabelFormats: { day: '%m-%d' },
-                labels: {
-                    rotation: -45,
-                    align: 'right',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                lineColor: '#FFFFFF',
-                tickColor: '#FFFFFF'
-            },
-            yAxis: {
-                title: {
-                    text: 'Bleached Status',
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold'
-                    }
-                },
-                gridLineColor: 'rgba(255, 255, 255, 0.2)',
-                categories: ['Healthy', 'Bleached'],
-                min: 0,
-                max: 1,
-                labels: {
-                    style: {
-                        color: '#FFFFFF',
-                        fontWeight: 'bold',
+
+
+                let tempData = [];
+                let temp = (await fetchAverageTemperature(id))['running_average_temperatures'];
+
+                console.log(temp)
+                for (let i = temp.length - 1; i >= 0; i--) {
+                    tempData.push({ timestep: i, value: temp[i] })
+                }
+
+                // Process temperature data into Highcharts format
+                const processedTemp = {
+                    chart: {
+                        backgroundColor: 'transparent',
                     },
-                },
-            },
-            series: [{
-                name: 'Temperature',
-                fontWeight: 'bold',
-                color: '#d46b16',
-                data: coralBleachedData.map(item => [new Date(item.date).getTime(), item.value]),
-                type: 'scatter',
-            }],
-            tooltip: { enabled: false },
-            plotOptions: {
-                series: {
-                    marker: { enabled: true, radius: 6 },
-                },
-            },
-        };
+                    title: {
+                        text: 'Average Temperature Over Time',
+                        style: {
+                            color: '#FFFFFF',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    xAxis: {
 
-        setBleachedCoralData(processedCoralBleached);
-        const prediction = { bleached: 1, confidence: 0.98 };
-        setBleachedPrediction(prediction);
+                        title: {
+                            text: 'Time',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labels: {
+                            align: 'right',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        lineColor: '#FFFFFF',
+                        tickColor: '#FFFFFF'
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Temperature (°C)',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labels: {
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        gridLineColor: 'rgba(255, 255, 255, 0.2)',
+                        lineColor: '#FFFFFF',
+                        tickColor: '#FFFFFF'
+                    },
+                    series: [{
+                        name: 'Temperature',
+                        data: tempData.map(item => [item.timestep, item.value]),
+                        type: 'line',
+                        color: '#d46b16',
+                        tooltip: {
+                            valueSuffix: ' °C',
+                        },
+                        lineWidth: 5,
+                        marker: {
+                            lineColor: '#FFFFFF'
+                        }
+                    }],
+                    tooltip: {
+                        shared: true,
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        style: {
+                            color: '#333'
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            marker: {
+                                enabled: true,
+                                fillColor: '#FFFFFF'
+                            }
+                        }
+                    }
+                };
+
+                setAverageTempData(processedTemp);
+
+                // Dummy coral bleached status data
+                // const coralBleachedData = [
+                //     { date: '2023-09-01', value: 0, status: 'Healthy' },
+                //     { date: '2023-09-02', value: 1, status: 'Bleached' },
+                //     { date: '2023-09-03', value: 1, status: 'Bleached' },
+                //     { date: '2023-09-04', value: 0, status: 'Healthy' },
+                //     { date: '2023-09-05', value: 1, status: 'Bleached' },
+                //     { date: '2023-09-06', value: 1, status: 'Bleached' },
+                //     { date: '2023-09-07', value: 0, status: 'Healthy' },
+                // ];
+
+
+                const coralBleachedData = await fetchBleachedCoralDataId(id);
+
+
+                // for (let i = temp.length - 1; i >= Math.max(0, temp.length - 1 - 6); i--) {
+                //     coralBleachedData.push({ date: sampleDates[6 - (temp.length - 1 - i)].date, value: temp[i].value })
+                // }
+
+
+                // Process coral bleached data into Highcharts format
+                const processedCoralBleached = {
+                    chart: {
+                        backgroundColor: 'transparent',
+                    },
+                    title: {
+                        text: 'Coral Bleaching Over Time',
+                        style: {
+                            color: '#FFFFFF',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    xAxis: {
+                        title: {
+                            text: 'Time',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labels: {
+                            align: 'right',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        lineColor: '#FFFFFF',
+                        tickColor: '#FFFFFF'
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Bleaching Status',
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        gridLineColor: 'rgba(255, 255, 255, 0.2)',
+                        categories: ['Healthy', 'Bleached'],
+                        min: 0,
+                        max: 1,
+                        labels: {
+                            style: {
+                                color: '#FFFFFF',
+                                fontWeight: 'bold',
+                            },
+                        },
+                    },
+                    series: [{
+                        name: 'Bleaching Status',
+                        fontWeight: 'bold',
+                        color: '#d46b16',
+                        data: coralBleachedData.map(item => [item.timestep, item.bleaching > 750 ? 1 : 0]),
+                        type: 'scatter',
+                    }],
+                    tooltip: { enabled: false },
+                    plotOptions: {
+                        series: {
+                            marker: { enabled: true, radius: 6 },
+                        },
+                    },
+                };
+
+                setBleachedCoralData(processedCoralBleached);
+
+
+
+                const prediction = { bleached: coralBleachedData[coralBleachedData.length-1].bleaching > 750 }
+
+
+                setBleachedPrediction(prediction);
+
+            } catch (error) {
+                console.error('Failed to fetch images:', error);
+            }
+
+
+        }
+        fetchData();
+
     }, []);
 
     // Handle image click to zoom
@@ -209,21 +233,17 @@ const MarkerInfo = () => {
         setZoomedImage(null);
     };
 
-    // Handle next image in slideshow
     const nextImage = () => {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length);
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     };
 
-    // Handle previous image in slideshow
     const prevImage = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
-        );
+        setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            {/* Floating Back Button */}
+        <div style={{ display: 'flex', height: '100vh' }}>
+            {/* Floating Back Button with SVG */}
             <Link
                 to="/map"
                 style={{
@@ -237,161 +257,103 @@ const MarkerInfo = () => {
                     display: 'flex',
                     alignItems: 'center',
                 }}
+            ></Link>
+
+            {/* Dashboard Container */}
+            <div
+                style={{
+                    width: '35%',
+                    overflowY: 'auto',
+                    padding: '10px',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    backgroundImage: "url('bg.png')",
+                }}
             >
-                {/* Back Button SVG could go here */}
-            </Link>
-
-            {/* Title for Marker ID */}
-            <h2 style={{ textAlign: 'center', color: '#FFFFFF', margin: '10px 0' }}>
-                Marker {id} Information
-            </h2>
-
-            {/* Upper Section Container */}
-            <div style={{ display: 'flex', flex: '1', padding: '10px' }}>
-                {/* Video Container */}
-                <div style={{ width: '50%', height: '100%', position: 'relative' }}>
-                    <iframe
-                        src="https://your-custom-stream-url.com/live-stream"
-                        width="100%"
-                        height="100%"
-                        style={{
-                            border: 0,
-                            position: 'absolute',
-                            top: 0,
-                            left: 10,
-                        }}
-                        allowFullScreen
-                    ></iframe>
-
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '10px',
-                            left: '20px',
-                            color: '#FFFFFF',
-                            border: '2px solid black',
-                            padding: '10px',
-                            borderRadius: '5px',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        }}
-                    >
-                        <h3 style={{ margin: '0', fontWeight: 'normal' }}>
-                            Most Recent Status:
-                            <span
-                                style={{
-                                    color: bleachedPrediction['bleached'] ? 'red' : 'green',
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                {bleachedPrediction['bleached'] ? ' Bleached' : ' Healthy'}
-                            </span>
-                        </h3>
-                        <p style={{ margin: 0 }}>
-                            Confidence: <span style={{ fontWeight: 'bold' }}>{bleachedPrediction['confidence']}</span>
-                        </p>
+                <h1 style={{ margin: '30px 0 0 0', color: '#FFFFFF' }}>Marker {id} Information</h1>
+                <h3 style={{ margin: '10px 0', fontSize: '20px', fontWeight: 'normal', color: '#FFFFFF' }}>
+                    Most Recent Status:
+                    <span style={{ color: bleachedPrediction['bleached'] ? 'red' : 'green', fontWeight: 'bold' }}>
+                        {bleachedPrediction['bleached'] ? ' Bleached' : ' Healthy'}
+                    </span>
+                </h3>
+                {/* Images */}
+                <div>
+                    <h2 style={{ margin: '10px 0', color: '#FFFFFF' }}>Recent Images</h2>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <button onClick={prevImage}>&#10094;</button>
+                        {images.length > 0 ? (
+                            <img
+                                src={images[currentImageIndex]}
+                                alt={`Slide ${currentImageIndex + 1}`}
+                                style={{ width: '100%', cursor: 'pointer' }}
+                                onClick={() => handleImageClick(images[currentImageIndex])}
+                            />
+                        ) : (
+                            <p style={{ color: '#FFFFFF' }}>Loading images...</p>
+                        )}
+                        <button onClick={nextImage}>&#10095;</button>
                     </div>
                 </div>
+                {/* Coral Bleached Status Chart */}
+                <div style={{ width: '95%', marginBottom: '30px', height: '350px' }}>
+                    <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} />
+                </div>
+                {/* Temperature Chart */}
+                <div style={{ width: '95%', marginTop: '20px', marginBottom: '30px', height: '350px' }}>
+                    <HighchartsReact highcharts={Highcharts} options={averageTempData} />
+                </div>
 
-                {/* Slideshow Section */}
+
+            </div>
+
+            {/* Fixed Video Container */}
+            <div
+                style={{
+                    width: '65%',
+                    padding: '10px',
+                    boxSizing: 'border-box',
+                    height: '100vh',
+                    overflow: 'hidden',
+                }}
+            >
+                <iframe
+                    src="https://your-custom-stream-url.com/live-stream"
+                    width="100%"
+                    height="90%"
+                    title="Video"
+                    allowFullScreen
+                    style={{ border: 'none' }}
+                ></iframe>
+            </div>
+
+            {/* Zoomed Image Modal */}
+            {zoomedImage && (
                 <div
+                    onClick={closeZoomedImage}
                     style={{
-                        width: '70%',
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
                         justifyContent: 'center',
-                        position: 'relative',
+                        alignItems: 'center',
+                        zIndex: 1000,
+                        cursor: 'pointer',
                     }}
                 >
-                    {/* Centered Title */}
-                    <h2
-                        style={{
-                            fontWeight: 'bold',
-                            color: 'white',
-                            textAlign: 'center',
-                        }}
-                    >
-                        Past Readings
-                    </h2>
-
-                    {/* Image with Navigation Buttons */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            position: 'relative',
-                            width: '80%',
-                            height: '300px',
-                        }}
-                    >
-                        {/* Previous Button */}
-                        <button
-                            onClick={prevImage}
-                            style={{
-                                position: 'absolute',
-                                left: '0px', // Close to the image
-                                fontSize: '50px',
-                                fontWeight: 'bold',
-                                color: '#FFFFFF',
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                zIndex: 10,
-                            }}
-                        >
-                            &lt;
-                        </button>
-
-                        {/* Image */}
-                        <img
-                            src={imageUrls[currentImageIndex]}
-                            alt={`Image ${currentImageIndex + 1}`}
-                            style={{
-                                width: "400px",
-                                objectFit: 'cover',
-                                borderRadius: '10px',
-                            }}
-                        />
-
-                        {/* Next Button */}
-                        <button
-                            onClick={nextImage}
-                            style={{
-                                position: 'absolute',
-                                right: '0px', // Close to the image
-                                fontSize: '50px',
-                                color: '#FFFFFF',
-                                background: 'transparent',
-                                border: 'none',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                zIndex: 10,
-                            }}
-                        >
-                            &gt;
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Graphs Section */}
-            <div style={{ flex: '1', display: 'flex', padding: '0 5px' }}>
-                <div style={{ flex: 1, padding: '0 5px' }}>
-                    <HighchartsReact
-                        highcharts={Highcharts}
-                        options={averageTempData}
-                        containerProps={{ style: { height: '99%' } }}
+                    <img
+                        src={zoomedImage}
+                        alt="Zoomed"
+                        style={{ maxWidth: '90%', maxHeight: '90%', border: '5px solid white' }}
                     />
                 </div>
-                <div style={{ flex: 1, padding: '0 5px' }}>
-                    <HighchartsReact
-                        highcharts={Highcharts}
-                        options={bleachedCoralData}
-                        containerProps={{ style: { height: '99%' } }}
-                    />
-                </div>
-            </div>
+            )}
         </div>
     );
 };

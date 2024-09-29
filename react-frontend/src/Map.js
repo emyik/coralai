@@ -6,7 +6,7 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import Highcharts, { Options } from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import './map.css';
-import { fetchAlerts } from "./api";
+import { fetchAlerts, fetchAverageTemperatureData, fetchCoralBleachingData, fetchRecentMarkers } from "./api";
 
 // Define the default icon for Leaflet
 let DefaultIcon = L.icon({
@@ -32,14 +32,7 @@ const Map = () => {
     if (container != null) {
       container._leaflet_id = null;
     }
-    const alertsData = [
-      { id: 1, status: "Good", description: "Marker 1 is healthy Marker 1 is healthy Marker 1 is healthy Marker 1 is healthyMarker 1 is healthyMarker 1 is healthy", markerId: 1 },
-      { id: 2, status: "Bad", description: "Marker 2 is bleached", markerId: 2 },
-      { id: 3, status: "Good", description: "Marker 3 is healthy", markerId: 3 },
-    ];
-    // const alertsData = fetchAlerts();
-    // console.log(alertsData + "- alertaData");
-    setAlerts(alertsData);
+   
     // Initialize the Leaflet map without zoom controls
     const map = L.map("map", {
       zoomControl: false, // Disable zoom controls
@@ -74,8 +67,9 @@ const Map = () => {
     // Fetch marker data
     const fetchData = async () => {
       try {
-        // Dummy data for bleached coral detection over time
-        const coralData = [
+
+        
+        const sampleDates = [
           { date: "2023-09-01", value: 50 },
           { date: "2023-09-02", value: 55 },
           { date: "2023-09-03", value: 70 },
@@ -85,34 +79,61 @@ const Map = () => {
           { date: "2023-09-07", value: 85 },
         ];
 
+        // const alertsData = [
+        //   { id: 1, status: "Good", description: "Marker 1 is healthy Marker 1 is healthy Marker 1 is healthy Marker 1 is healthyMarker 1 is healthyMarker 1 is healthy", markerId: 1 },
+        //   { id: 2, status: "Bad", description: "Marker 2 is bleached", markerId: 2 },
+        //   { id: 3, status: "Good", description: "Marker 3 is healthy", markerId: 3 },
+        // ];
+    
+    
+        const alertsData = await fetchAlerts();
+        console.log(alertsData + "- alertaData");
+    
+    
+        setAlerts(alertsData);
 
+
+        // Dummy data for bleached coral detection over time
+        // const coralData = [
+        //   { date: "2023-09-01", value: 50 },
+        //   { date: "2023-09-02", value: 55 },
+        //   { date: "2023-09-03", value: 70 },
+        //   { date: "2023-09-04", value: 80 },
+        //   { date: "2023-09-05", value: 60 },
+        //   { date: "2023-09-06", value: 90 },
+        //   { date: "2023-09-07", value: 85 },
+        // ];
+
+
+        const coralData = await fetchCoralBleachingData();
+
+        // for (let i = tempCoral.length - 1; i >= Math.max(0, tempCoral.length - 1 - 6); i--) {
+        //   coralData.push({date: sampleDates[6-(tempCoral.length - 1-i)].date, value: tempCoral[i].value})
+        // }
 
         const processedCoral = {
           chart: {
             backgroundColor: 'transparent', // Make the background transparent
           },
           title: {
-            text: 'Coral Bleached Over Time',
+            text: 'Coral Bleaching Over Time',
             style: {
               color: '#FFFFFF', // Make title text white
               fontWeight: 'bold'
             }
           },
           xAxis: {
-            type: 'datetime',
+            // type: 'datetime',
             title: {
-              text: 'Date',
+              text: 'Time',
               style: {
                 color: '#FFFFFF', // Make X-axis title white
                 fontWeight: 'bold'
               }
             },
-            tickInterval: 24 * 3600 * 1000, // One day
-            dateTimeLabelFormats: {
-              day: '%m-%d', // Format for the day
-            },
+            // tickInterval: 24 * 3600 * 1000, // One day
+           
             labels: {
-              rotation: -45, // Rotate labels for better visibility
               align: 'right', // Align labels to the right
               style: {
                 color: '#FFFFFF', // Make X-axis labels white
@@ -143,7 +164,7 @@ const Map = () => {
           series: [{
             name: '% Bleached',
             fontWeight: 'bold',
-            data: coralData.map(item => [new Date(item.date).getTime(), item.value]),
+            data: coralData.map(item => [item.timestep, item.value]),
             type: 'line',
             color: '#d46b16', // Make the line white
             tooltip: {
@@ -173,23 +194,24 @@ const Map = () => {
 
         setBleachedCoralData(processedCoral);
 
-        // Dummy data for average temperature over time
-
-        
-        const tempData = [
-          { date: "2023-09-01", value: 25 },
-          { date: "2023-09-02", value: 26 },
-          { date: "2023-09-03", value: 27 },
-          { date: "2023-09-04", value: 28 },
-          { date: "2023-09-05", value: 27 },
-          { date: "2023-09-06", value: 29 },
-          { date: "2023-09-07", value: 30 },
-        ];
 
 
-        
+        // const tempData = [
+        //   { date: "2023-09-01", value: 25 },
+        //   { date: "2023-09-02", value: 26 },
+        //   { date: "2023-09-03", value: 27 },
+        //   { date: "2023-09-04", value: 28 },
+        //   { date: "2023-09-05", value: 27 },
+        //   { date: "2023-09-06", value: 29 },
+        //   { date: "2023-09-07", value: 30 },
+        // ];
 
-        const processedTemp = {
+        const tempData = await fetchAverageTemperatureData();
+        // for (let i = temp.length - 1; i >= Math.max(0, temp.length - 1 - 6); i--) {
+        //   tempData.push({ date: sampleDates[6 - (temp.length - 1-i)].date, value: temp[i].value })
+        // }
+
+        const processedTemp =  {
           chart: {
             backgroundColor: 'transparent', // Make the background transparent
           },
@@ -201,24 +223,21 @@ const Map = () => {
             }
           },
           xAxis: {
-            type: 'datetime',
+            // type: 'datetime',
             title: {
-              text: 'Date',
+              text: 'Time',
               style: {
-                fontWeight: 'bold',
-                color: '#FFFFFF' // Make X-axis title white
+                color: '#FFFFFF', // Make X-axis title white
+                fontWeight: 'bold'
               }
             },
-            tickInterval: 24 * 3600 * 1000, // One day
-            dateTimeLabelFormats: {
-              day: '%m-%d', // Format for the day
-            },
+            // tickInterval: 24 * 3600 * 1000, // One day
+           
             labels: {
-              rotation: -45, // Rotate labels for better visibility
               align: 'right', // Align labels to the right
               style: {
-                fontWeight: 'bold',
-                color: '#FFFFFF' // Make X-axis labels white
+                color: '#FFFFFF', // Make X-axis labels white
+                fontWeight: 'bold'
               }
             },
             lineColor: '#FFFFFF', // Make X-axis line white
@@ -243,15 +262,16 @@ const Map = () => {
           },
           series: [{
             name: 'Temperature',
-            data: tempData.map(item => [new Date(item.date).getTime(), item.value]),
+            fontWeight: 'bold',
+            data: tempData.map(item => [item.timestep, item.avg_temperature]),
             type: 'line',
             color: '#d46b16', // Make the line white
             tooltip: {
               valueSuffix: ' °C',
             },
-            lineWidth: 5,
+            lineWidth: 5, // Increase the line thickness
             marker: {
-              lineColor: '#FFFFFF' // Make marker outline white
+              lineColor: '#d46b16' // Make marker outline white
             }
           }],
           tooltip: {
@@ -272,31 +292,34 @@ const Map = () => {
         };
         setAverageTempData(processedTemp);
 
-        // Dummy data for recent markers
-        const markersData = [
-          { id: 1, name: "Bleached Coral A", lat: 51.505, lng: -0.09, classification: 1 },
-          { id: 2, name: "Bleached Coral B", lat: 51.51, lng: -0.1, classification: 0 },
-          { id: 3, name: "Bleached Coral C", lat: 51.52, lng: -0.08, classification: 1 },
-          { id: 4, name: "Bleached Coral D", lat: 51.54, lng: -0.08, classification: 1 },
-        ];
+        // const markersData = [
+        //   { id: 1, name: "Bleached Coral A", lat: 51.505, lng: -0.09, classification: 1 },
+        //   { id: 2, name: "Bleached Coral B", lat: 51.51, lng: -0.1, classification: 0 }, // bleached = 1
+        //   { id: 3, name: "Bleached Coral C", lat: 51.52, lng: -0.08, classification: 1 },
+        //   { id: 4, name: "Bleached Coral D", lat: 51.54, lng: -0.08, classification: 1 },
+        // ];
+
+        const markersData = await fetchRecentMarkers();
+        console.log(markersData)
         setRecentMarkers(markersData);
 
         // Add markers to the map
         markersData.forEach((markerData) => {
-          const { lat, lng, name, classification } = markerData;
-          const marker = L.marker([lat, lng], {
+          console.log(markerData)
+          const { latitude, longitude, id, bleached } = markerData;
+          const marker = L.marker([latitude, longitude], {
             icon: L.icon({
-              iconUrl: classification
-                ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png"
-                : "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
+              iconUrl: bleached
+                ? "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png"
+                : "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
             }),
           }).addTo(map);
 
-          const markerInfoLink = `/marker/${markerData.id}`; // Link to your component
+          const markerInfoLink = `/marker/${id}`; // Link to your component
 
           const popupContent = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-weight: bold;">${name}</span>
+              <span style="font-weight: bold;">Agent ${id}</span>
               <a href="${markerInfoLink}" target="_blank" style="text-decoration: none; color: black;">
                 ${ExternalLinkIcon()}
               </a>
@@ -356,10 +379,11 @@ const Map = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          overflowY: "auto"  // Add scroll for overflowing content
         }}>
           <h1 style={{ color: "#FFFFFF", textAlign: "center", width: "100%", marginTop: "30px", marginBottom: "8px" }}>QUORAL Dashboard</h1>
           <h2 style={{ color: "#FFFFFF", textAlign: "center", fontSize: "20px", margin: "8px 0" }}>Alerts</h2>
-
+      
           {/* Alerts Section */}
           <div style={{ width: "100%", marginBottom: "20px" }}>
             {alerts.map(alert => (
@@ -367,46 +391,47 @@ const Map = () => {
                 key={alert.id}
                 onClick={() => focusMarker(alert.markerId)}
                 style={{
-                  border: "1px solid white", // Black border
-                  color: "white", // Text color
+                  border: "1px solid white",
+                  color: "white",
                   padding: "5px",
                   marginBottom: "3px",
                   cursor: "pointer",
-                  display: "flex", // Flex to align items
-                  alignItems: "center", // Center vertically
-                  fontSize: "1em", // Smaller text size
-                  transition: "background-color 0.3s, color 0.3s", // Transition for hover effects
+                  display: "flex",
+                  alignItems: "center",
+                  fontSize: "1em",
+                  transition: "background-color 0.3s, color 0.3s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)"; // Light hover effect
-                  e.currentTarget.style.color = "black"; // Change text color on hover
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                  e.currentTarget.style.color = "black";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent"; // Remove hover effect
-                  e.currentTarget.style.color = "white"; // Revert text color
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = "white";
                 }}
               >
-                {/* Dot indicator based on alert status */}
                 <div
                   style={{
                     width: "10px",
                     height: "10px",
                     borderRadius: "50%",
-                    backgroundColor: alert.status === "Good" ? "#005700" : "red", // Dot color
-                    marginRight: "8px", // Space between dot and text
+                    backgroundColor: alert.status === "Good" ? "#005700" : "red",
+                    marginRight: "8px",
                   }}
                 />
-                <span style={{ flex: 1, textAlign: "left" }}>{alert.description}</span> {/* Align text to the left */}
+                <span style={{ flex: 1, textAlign: "left" }}>{alert.description}</span>
               </div>
             ))}
           </div>
-
-
-          <div style={{ width: "100%", height: "100%" }}>
-            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "99%" } }} />
+      
+          {/* Coral Bleached Data */}
+          <div style={{ width: "100%", height: "400px" }}>  {/* Set a fixed height */}
+            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "100%" } }} />
           </div>
-          <div style={{ width: "100%", height: "100%" }}>
-            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "99%" } }} />
+      
+          {/* Average Temperature Data */}
+          <div style={{ width: "100%", height: "400px" }}>  {/* Set a fixed height */}
+            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "100%" } }} />
           </div>
         </div>
       )}
