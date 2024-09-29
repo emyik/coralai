@@ -324,14 +324,7 @@ const Map = () => {
                 ${ExternalLinkIcon()}
               </a>
             </div>
-            <iframe 
-              src="https://your-custom-stream-url.com/live-stream" 
-              width="300" 
-              height="200" 
-              frameborder="0" 
-              allowfullscreen
-              style="border:0;"
-            ></iframe><br>
+           <br>
           `;
 
           // Bind the popup with the customized content
@@ -356,7 +349,7 @@ const Map = () => {
   const focusMarker = (markerId) => {
     const marker = recentMarkers.find(m => m.id === markerId);
     if (marker) {
-      mapRef.current.setView([marker.lat, marker.lng], 13); // Adjust zoom level as needed
+      mapRef.current.setView([marker.latitude, marker.longitude], 13); // Adjust zoom level as needed
     }
   };
   // Toggle the visibility of the dashboard
@@ -389,7 +382,7 @@ const Map = () => {
             {alerts.map(alert => (
               <div
                 key={alert.id}
-                onClick={() => focusMarker(alert.markerId)}
+                onClick={() => focusMarker(alert.id)}
                 style={{
                   border: "1px solid white",
                   color: "white",

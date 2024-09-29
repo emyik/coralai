@@ -301,7 +301,7 @@ const MarkerInfo = () => {
                             <img
                                 src={images[currentImageIndex]}
                                 alt={`Slide ${currentImageIndex + 1}`}
-                                style={{ width: '100%', cursor: 'pointer' }}
+                                style={{ width: '400px', height: '300px', cursor: 'pointer' }}
                                 onClick={() => handleImageClick(images[currentImageIndex])}
                             />
                         ) : (
