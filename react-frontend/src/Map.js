@@ -6,6 +6,7 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import Highcharts, { Options } from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import './map.css';
+import { fetchAlerts } from "./api";
 
 // Define the default icon for Leaflet
 let DefaultIcon = L.icon({
@@ -36,6 +37,8 @@ const Map = () => {
       { id: 2, status: "Bad", description: "Marker 2 is bleached", markerId: 2 },
       { id: 3, status: "Good", description: "Marker 3 is healthy", markerId: 3 },
     ];
+    // const alertsData = fetchAlerts();
+    // console.log(alertsData + "- alertaData");
     setAlerts(alertsData);
     // Initialize the Leaflet map without zoom controls
     const map = L.map("map", {
@@ -81,6 +84,8 @@ const Map = () => {
           { date: "2023-09-06", value: 90 },
           { date: "2023-09-07", value: 85 },
         ];
+
+
 
         const processedCoral = {
           chart: {
@@ -153,7 +158,7 @@ const Map = () => {
             shared: true,
             backgroundColor: 'rgba(255, 255, 255, 0.9)', // Optional: Adjust tooltip background color
             style: {
-              color: '#FFFFFF' // Optional: Adjust tooltip text color
+              color: '#333' // Optional: Adjust tooltip text color
             }
           },
           plotOptions: {
@@ -169,6 +174,8 @@ const Map = () => {
         setBleachedCoralData(processedCoral);
 
         // Dummy data for average temperature over time
+
+        
         const tempData = [
           { date: "2023-09-01", value: 25 },
           { date: "2023-09-02", value: 26 },
@@ -178,6 +185,10 @@ const Map = () => {
           { date: "2023-09-06", value: 29 },
           { date: "2023-09-07", value: 30 },
         ];
+
+
+        
+
         const processedTemp = {
           chart: {
             backgroundColor: 'transparent', // Make the background transparent
@@ -363,7 +374,7 @@ const Map = () => {
                   cursor: "pointer",
                   display: "flex", // Flex to align items
                   alignItems: "center", // Center vertically
-                  fontSize: "0.8em", // Smaller text size
+                  fontSize: "1em", // Smaller text size
                   transition: "background-color 0.3s, color 0.3s", // Transition for hover effects
                 }}
                 onMouseEnter={(e) => {
@@ -392,7 +403,7 @@ const Map = () => {
 
 
           <div style={{ width: "100%", height: "100%" }}>
-            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "97%" } }} />
+            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "100%" } }} />
           </div>
           <div style={{ width: "100%", height: "100%" }}>
             <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "100%" } }} />
