@@ -403,10 +403,10 @@ const Map = () => {
 
 
           <div style={{ width: "100%", height: "100%" }}>
-            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "100%" } }} />
+            <HighchartsReact highcharts={Highcharts} options={bleachedCoralData} containerProps={{ style: { height: "99%" } }} />
           </div>
           <div style={{ width: "100%", height: "100%" }}>
-            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "100%" } }} />
+            <HighchartsReact highcharts={Highcharts} options={averageTempData} containerProps={{ style: { height: "99%" } }} />
           </div>
         </div>
       )}
