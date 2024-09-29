@@ -1,4 +1,7 @@
 /* Navbar.css */
+* {
+    font: Tahoma;
+  }
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -13,21 +16,22 @@
 
 .navbar-title {
     font-size: 28px; /* Increased font size */
-    margin-left: 10px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Small shadow effect */
+    margin-left: 30px;
+    margin-top: 5px;
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); */
 }
 
 .navbar-links {
     display: flex;
-    gap: 15px; /* Spacing between links */
-    margin-right: 10px;
+    gap: 50px; /* Spacing between links */
+    margin-right: 30px;
 }
 
 .navbar-link {
     color: white;
     text-decoration: none; /* Remove underline */
-    font-size: 20px; /* Increased font size for links */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Small shadow effect for links */
+    font-size: 23px; /* Increased font size for links */
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); Small shadow effect for links */
 }
 
 .navbar-link:hover {

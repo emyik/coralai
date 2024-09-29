@@ -3,7 +3,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useParams, Link } from 'react-router-dom';
 import './map.css';
-import { fetchAverageTemperature, fetchBleachedCoralDataId, fetchBleachedCoralStatus, fetchPastImages } from './api';
+import { fetchAverageTemperature, fetchBleachedCoralDataId, fetchBleachedCoralStatus, fetchPastImages, getStream, startStream, stopStream } from './api';
 
 const MarkerInfo = () => {
     const [averageTempData, setAverageTempData] = useState({});
@@ -13,20 +13,31 @@ const MarkerInfo = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0); // State for slideshow
     let { id } = useParams();
     const [images, setImages] = useState([]);
+    const [frame, setFrame] = useState(null)
 
 
     const img = require.context('../public/images', true);
 
     useEffect(() => {
+        // Function to update the state
+        // Function to handle incoming stream messages
+        const handleIncomingData = (data) => {
+            setFrame(`data:image/jpeg;base64,${data}`);
+            console.log(1)
+        };
+
+        const closeStream = getStream(handleIncomingData, id); // Establish the WebSocket connection
+
         const fetchData = async () => {
             try {
+
                 try {
-                const fetchedImages = await fetchPastImages(id);
-                console.log(fetchedImages);
-                setImages(fetchedImages.map(x => img(`./${x.split('/')[1]}`)))
+                    const fetchedImages = await fetchPastImages(id);
+                    console.log(fetchedImages);
+                    setImages(fetchedImages.map(x => img(`./${x.split('/')[1]}`)))
 
                 }
-                catch(e) {
+                catch (e) {
 
                 }
 
@@ -208,7 +219,7 @@ const MarkerInfo = () => {
 
 
 
-                const prediction = { bleached: coralBleachedData[coralBleachedData.length-1].bleaching > 750 }
+                const prediction = { bleached: coralBleachedData[coralBleachedData.length - 1].bleaching > 750 }
 
 
                 setBleachedPrediction(prediction);
@@ -220,8 +231,10 @@ const MarkerInfo = () => {
 
         }
         fetchData();
-
-    }, []);
+        return () => {
+            closeStream(); // Call the function to close the WebSocket
+        };
+    }, [id]);
 
     // Handle image click to zoom
     const handleImageClick = (imageSrc) => {
@@ -319,14 +332,14 @@ const MarkerInfo = () => {
                     overflow: 'hidden',
                 }}
             >
-                <iframe
-                    src="https://your-custom-stream-url.com/live-stream"
-                    width="100%"
-                    height="90%"
-                    title="Video"
-                    allowFullScreen
-                    style={{ border: 'none' }}
-                ></iframe>
+                <div>
+                    {frame ? (
+                        <img src={frame} alt="Streaming frame" style={{ width: '100%' }} />
+                    ) : (
+                        <p>Waiting for video stream...</p>
+                    )}
+                </div>
+
             </div>
 
             {/* Zoomed Image Modal */}

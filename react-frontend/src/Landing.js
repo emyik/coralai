@@ -58,20 +58,21 @@ function Landing() {
     if (!showFish) return null; // Return null if fish should not be shown
 
     // Define an array of positions for even distribution
-    const positions = [
+     // Define an array of positions for even distribution
+     const positions = [
       { left: '5%', bottom: '5vh' },   // Top left
       { left: '10%', bottom: '20vh' },  // Mid left
       { left: '15%', bottom: '10vh' },  // Top left
       { left: '20%', bottom: '40vh' },  // Mid left
-      { left: '25%', bottom: '35vh' },  // Mid left
-      { left: '30%', bottom: '80vh' },  // Bottom left
+      // { left: '25%', bottom: '35vh' },  // Mid left
+      // { left: '30%', bottom: '80vh' },  // Bottom left
       { left: '35%', bottom: '15vh' },  // Top left
-      { left: '40%', bottom: '50vh' },  // Mid left
+      // { left: '40%', bottom: '50vh' },  // Mid left
       { left: '50%', bottom: '5vh' },   // Top center
-      { left: '55%', bottom: '90vh' },  // Bottom center
+      // { left: '55%', bottom: '90vh' },  // Bottom center
       { left: '60%', bottom: '20vh' },  // Mid left
       { left: '70%', bottom: '10vh' },  // Top right
-      { left: '75%', bottom: '80vh' },  // Bottom right
+      // { left: '75%', bottom: '80vh' },  // Bottom right
       { left: '80%', bottom: '30vh' },  // Mid right
       { left: '85%', bottom: '25vh' },  // Mid right
       // { left: '90%', bottom: '10vh' },  // Top right

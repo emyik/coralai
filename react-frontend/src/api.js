@@ -140,3 +140,70 @@ export const fetchPastImages = async (markerId) => {
         throw error;
     }
 };
+
+
+// Function to fetch recent markers data and process the base64 images
+export const startStream = async (markerId) => {
+    try {
+        const response = await fetch(`${BASE_URL}/startstream/${markerId}`);
+        if (!response.ok) {
+            throw new Error(`Error fetching stream: ${response.statusText}`);
+        }
+
+      
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+
+// Function to fetch recent markers data and process the base64 images
+export const stopStream = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}/stopstream/}`);
+        if (!response.ok) {
+            throw new Error(`Error fetching stream: ${response.statusText}`);
+        }
+
+      
+
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// Function to fetch recent markers data and process the base64 images
+export const getStream = (onMessage, id) => {
+    var b = `ws://ec2-54-208-48-146.compute-1.amazonaws.com:8000/ws/stream?id=${id}`
+    const socket = new WebSocket(b);
+
+    // WebSocket event listeners
+    socket.onopen = () => {
+        console.log("WebSocket connection established.");
+    };
+
+    socket.onmessage = (event) => {
+        // Call the provided callback function with the received data
+        console.log(event.data);
+        // const data = JSON.parse(event.data);
+        onMessage(event.data); // Process the incoming data
+    };
+
+    socket.onerror = (error) => {
+        console.error(`WebSocket error: ${error.message}`);
+    };
+
+    socket.onclose = (event) => {
+        console.log(`WebSocket connection closed: ${event.reason}`);
+    };
+
+    // Return a function to close the WebSocket connection
+    return () => {
+        socket.close();
+    };
+};
