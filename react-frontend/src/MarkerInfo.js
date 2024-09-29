@@ -34,7 +34,7 @@ const MarkerInfo = () => {
                 try {
                     const fetchedImages = await fetchPastImages(id);
                     console.log(fetchedImages);
-                    setImages(fetchedImages.map(x => img(`./${x.split('/')[1]}`)))
+                    setImages(fetchedImages.map(x => img(`./${x.split('/')[x.split('/').length-1]}`)))
 
                 }
                 catch (e) {
